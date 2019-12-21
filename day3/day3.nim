@@ -100,5 +100,13 @@ for p in intersectionPoints:
     var mDis: int = abs(p.x) + abs(p.y)
     manhattanDistance.add(mDis)
 
-echo manhattanDistance.min()
+echo "Part1: Minimmun manhattan distance is ", manhattanDistance.min()
 
+# calculate steps to intersection point
+var stepsOfIntersectionPoints: seq[int]
+for p in intersectionPoints:
+    var steps1stWire: int = pointsCrossedBy1stWire.find(p)
+    var steps2ndWire: int = pointsCrossedBy2ndWire.find(p)
+    stepsOfIntersectionPoints.add(steps1stWire + steps2ndWire)
+
+echo "Part1: Fewest combined steps is ", stepsOfIntersectionPoints.min()
