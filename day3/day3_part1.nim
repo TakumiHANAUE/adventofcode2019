@@ -75,14 +75,16 @@ var pathSeq1st: seq[Path]
 var pathSeq2nd: seq[Path]
 
 inputFile = open("./day3input.txt", fmRead)
-# read 1st line
+# read 1st wire
 wirePath1st = inputFile.readLine()
 for path in wirePath1st.split(","):
     pathSeq1st.add(parsePath(path))
-# read 2nd line
+# read 2nd wire
 wirePath2nd = inputFile.readLine()
 for path in wirePath2nd.split(","):
     pathSeq2nd.add(parsePath(path))
+
+close(inputFile)
 
 # get points crossed by wire
 var pointsCrossedBy1stWire: seq[Point] = getCrossedPoints(pathSeq1st)
