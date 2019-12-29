@@ -15,6 +15,7 @@ proc getParameterMode(opecode, argNumber: int ): int =
     delete(modeParams, 3, 4)
     reverse(modeParams)
     result = parseInt($modeParams[(argNumber-1)])
+    #echo " parameter mode ", result
     # result = 0: Position mode
     # result = 1: Immediate mode
 
@@ -27,6 +28,7 @@ proc getValue(pos: int, program: seq[int], argNumber: int): int =
         result = arg
     else:
         echo "Invalid mode type"
+    #echo " value", argNumber, " = ", result
 
 proc opeCode1(pos: int, program: var seq[int]): void =
     #echo "c1 ", program[pos], " ", program[pos + 1], " ", program[pos + 2], " ", program[pos + 3]
@@ -36,7 +38,6 @@ proc opeCode1(pos: int, program: var seq[int]): void =
     case getParameterMode(program[pos], 3)
     of 0:
         # position mode
-        #echo " ", value1, " ", value2
         let arg3: int = program[pos + 3]
         program[arg3] = value1 + value2
     of 1:
@@ -53,7 +54,6 @@ proc opeCode2(pos: int, program: var seq[int]): void =
     case getParameterMode(program[pos], 3)
     of 0:
         # position mode
-        #echo " ", value1, " ", value2
         let arg3: int = program[pos + 3]
         program[arg3] = value1 * value2
     of 1:
@@ -62,8 +62,7 @@ proc opeCode2(pos: int, program: var seq[int]): void =
     else:
         echo "Invalid parameter mode"
 
-proc opeCode3(pos: int, program: var seq[int]): void =
-    let input: int = 1
+proc opeCode3(pos: int, program: var seq[int], input: int): void =
     let arg1: int = program[pos + 1]
     #echo "c3 ", program[pos], " ", arg1
     case getParameterMode(program[pos], 1)
@@ -89,9 +88,46 @@ proc opeCode4(pos: int, program: var seq[int]): void =
     else:
         echo "Invalid parameter mode"
 
+proc opeCode5(pos: int, program: var seq[int], pointerShift: var int): void =
+    var value1: int = getValue(pos, program, 1)
+    var value2: int = getValue(pos, program, 2)
+    if ( value1 != 0 ):
+        pointerShift = value2 - pos
+    else:
+        pointerShift = 3
+
+proc opeCode6(pos: int, program: var seq[int], pointerShift: var int): void =
+    var value1: int = getValue(pos, program, 1)
+    var value2: int = getValue(pos, program, 2)
+    if ( value1 == 0 ):
+        pointerShift = value2 - pos
+    else:
+        pointerShift = 3
+
+proc opeCode7(pos: int, program: var seq[int]): void =
+    var value1: int = getValue(pos, program, 1)
+    var value2: int = getValue(pos, program, 2)
+    let arg3: int = program[pos + 3]
+    if ( value1 < value2 ):
+        program[arg3] = 1
+    else:
+        program[arg3] = 0
+
+proc opeCode8(pos: int, program: var seq[int]): void =
+    var value1: int = getValue(pos, program, 1)
+    var value2: int = getValue(pos, program, 2)
+    let arg3: int = program[pos + 3]
+    if ( value1 == value2 ):
+        program[arg3] = 1
+    else:
+        program[arg3] = 0
+
+#################################
+
 var inputFile: File
 var program: string
 var programSeq: seq[int]
+let input: int = 5
 
 # store input intcode program
 inputFile = open("./day5input.txt", fmRead)
@@ -101,7 +137,7 @@ for code in program.split(","):
 
 # run program
 var i: int = 0
-var pointerShift: int = 4
+var pointerShift: int = 5
 while getInstCode(programSeq[i]) != 99:
     case getInstCode(programSeq[i])
     of 1:
@@ -111,15 +147,24 @@ while getInstCode(programSeq[i]) != 99:
         opeCode2(i, programSeq)
         pointerShift = 4
     of 3:
-        opeCode3(i, programSeq)
+        opeCode3(i, programSeq, input)
         pointerShift = 2
     of 4:
         opeCode4(i, programSeq)
         pointerShift = 2
+    of 5:
+        opeCode5(i, programSeq, pointerShift)
+    of 6:
+        opeCode6(i, programSeq, pointerShift)
+    of 7:
+        opeCode7(i, programSeq)
+        pointerShift = 4
+    of 8:
+        opeCode8(i, programSeq)
+        pointerShift = 4
     else:
-        echo "ERR: Invalid opecode ", i
+        echo "ERR: Invalid opecode ", i, " ", programSeq[i]
         break
-    # echo i, " ", programSeq
     inc(i, pointerShift)
-
+#echo i, " ", programSeq
 echo "Program halts."
