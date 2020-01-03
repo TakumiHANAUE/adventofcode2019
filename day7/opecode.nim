@@ -62,6 +62,7 @@ proc opeCode2*(pos: int, program: var seq[int]): void =
 
 proc opeCode3*(pos: int, program: var seq[int], input: int): void =
     let arg1: int = program[pos + 1]
+    #echo "input: ", input
     #echo "c3 ", program[pos], " ", arg1
     case getParameterMode(program[pos], 1)
     of 0:
