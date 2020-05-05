@@ -3,7 +3,7 @@ import math
 import sequtils
 
 type
-    OrthantOder = enum
+    OrthantOrder = enum
         ONE = 1, TWO, THREE, FOUR
 
 type
@@ -16,12 +16,12 @@ type
     RelativePosition = tuple
         x: int
         y: int
-        orthant: OrthantOder
+        orthant: OrthantOrder
 
-proc getOrthantOrder(oriX, oriY, refX, refY: int): OrthantOder =
+proc getOrthantOrder(oriX, oriY, refX, refY: int): OrthantOrder =
     var xDiff: int = 0
     var yDiff: int = 0
-    var order: OrthantOder = ONE
+    var order: OrthantOrder = ONE
     xDiff = refX - oriX
     yDiff = refY - oriY
     if xDiff >= 0 and yDiff >= 0:
@@ -59,7 +59,7 @@ for stationCandidate in asteroidMap:
     for asteroid in asteroidMap:
         var xDiff: int = 0
         var yDiff: int = 0
-        var order: OrthantOder = ONE
+        var order: OrthantOrder = ONE
         xDiff = asteroid.x - stationCandidate.x
         yDiff = asteroid.y - stationCandidate.y
         order = getOrthantOrder(stationCandidate.x, stationCandidate.y, asteroid.x, asteroid.y)
