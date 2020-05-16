@@ -14,3 +14,4 @@ while robot.isRunning():
     if painted == true:
         robot.move()
 robot.outputPaintedPanelNum()
+robot.showRegistrationIdentifier()

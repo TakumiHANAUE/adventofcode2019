@@ -17,6 +17,13 @@ type
     Color = enum
         BLACK = 0, WHITE
 
+const START_PANEL_COLOR: Color = WHITE
+
+type
+    Panel = tuple
+        position: Position
+        color: Color
+
 type
     Direction = enum
         X_POSITIVE, X_NEGATIVE, Y_POSITIVE, Y_NEGATIVE
@@ -65,7 +72,9 @@ method readProgram*(robot: PaintingRobot, fileName: string): void {.base.} =
 
 method scanPanelColor*(robot: PaintingRobot): void {.base.} =
     var panelColor: Color = BLACK
-    if robot.paintedPanels.len != 0:
+    if robot.paintedPanels.len == 0:
+        panelColor = START_PANEL_COLOR
+    elif robot.paintedPanels.len != 0:
         for i in 0..robot.paintedPanels.high:
             if robot.paintedPanels[i].pos == robot.position:
                 var index: int = robot.paintedPanels[i].color.high
@@ -191,3 +200,46 @@ method isRunning*(robot: PaintingRobot): bool {.base.} =
 
 method outputPaintedPanelNum*(robot: PaintingRobot): void {.base.} =
     echo "Painted ", robot.paintedPanels.len, " panels."
+
+method showRegistrationIdentifier*(robot: PaintingRobot): void {.base.} =
+    # gather position and color information for all panels
+    var allPaintedPanels: seq[Panel]
+    var xCoordinates: seq[int]
+    var yCoordinates: seq[int]
+    for i in 0..robot.paintedPanels.high:
+        var atLastPainted = robot.paintedPanels[i].color.high
+        allPaintedPanels.add((robot.paintedPanels[i].pos, robot.paintedPanels[i].color[atLastPainted]))
+        xCoordinates.add(robot.paintedPanels[i].pos.x)
+        yCoordinates.add(robot.paintedPanels[i].pos.y)
+    # # sort panels in order
+    # var sortedAllPaintedPanels: seq[Panel]
+    # sortedAllPaintedPanels = sorted(allPaintedPanels, panelPositionCmp, SortOrder.Ascending)
+    # get min/max value of x/y coordinate
+    var minX: int = xCoordinates.min()
+    var maxX: int = xCoordinates.max()
+    var minY: int = yCoordinates.min()
+    var maxY: int = yCoordinates.max()
+    # make initial panels to show
+    var identifier: seq[seq[Panel]]
+    for y in minY..maxY:
+        var panelRow: seq[Panel]
+        for x in minX..maxX:
+            var position: Position = (x, y)
+            panelRow.add( (position, BLACK) )
+        identifier.add(panelRow)
+    # input painted color
+    for panel in allPaintedPanels.items:
+        let indexX = panel.position.x - minX
+        let indexY = panel.position.y - minY
+        identifier[indexY][indexX] = panel
+    # output Registration Identifier
+    for y in 0..identifier.high:
+        for x in 0..identifier[0].high:
+            var color: Color = identifier[y][x].color
+            var printChar: string = ""
+            if color == BLACK:
+                printChar = " "
+            elif color == WHITE:
+                printChar = "X"
+            stdout.write printChar
+        echo ""
