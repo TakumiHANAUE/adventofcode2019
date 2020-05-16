@@ -28,12 +28,12 @@ type
     Direction = enum
         X_POSITIVE, X_NEGATIVE, Y_POSITIVE, Y_NEGATIVE
 
-        #                Y_POSITIVE
-        #                ^
+        #                Y_NEGATIVE
         #                |
         # X_NEGATIVE --- + ---> X_POSITIVE
         #                |
-        #                Y_NEGATIVE
+        #                v
+        #                Y_POSITIVE
 
 type
     TurnDirection = enum
@@ -99,26 +99,26 @@ method move*(robot: PaintingRobot): void {.base.} =
     var turnDirection: TurnDirection = robot.readDirectionToTurn()
     if robot.direction == X_POSITIVE:
         if turnDirection == LEFT90DEG:
-            nextPos = (robot.position.x, robot.position.y + 1)
-            nextDirection = Y_POSITIVE
-        elif turnDirection == RIGHT90DEG:
             nextPos = (robot.position.x, robot.position.y - 1)
             nextDirection = Y_NEGATIVE
+        elif turnDirection == RIGHT90DEG:
+            nextPos = (robot.position.x, robot.position.y + 1)
+            nextDirection = Y_POSITIVE
     elif robot.direction == X_NEGATIVE:
         if turnDirection == LEFT90DEG:
-            nextPos = (robot.position.x, robot.position.y - 1)
-            nextDirection = Y_NEGATIVE
-        elif turnDirection == RIGHT90DEG:
             nextPos = (robot.position.x, robot.position.y + 1)
             nextDirection = Y_POSITIVE
-    elif robot.direction == Y_POSITIVE:
+        elif turnDirection == RIGHT90DEG:
+            nextPos = (robot.position.x, robot.position.y - 1)
+            nextDirection = Y_NEGATIVE
+    elif robot.direction == Y_NEGATIVE:
         if turnDirection == LEFT90DEG:
             nextPos = (robot.position.x - 1, robot.position.y)
             nextDirection = X_NEGATIVE
         elif turnDirection == RIGHT90DEG:
             nextPos = (robot.position.x + 1, robot.position.y)
             nextDirection = X_POSITIVE
-    elif robot.direction == Y_NEGATIVE:
+    elif robot.direction == Y_POSITIVE:
         if turnDirection == LEFT90DEG:
             nextPos = (robot.position.x + 1, robot.position.y)
             nextDirection = X_POSITIVE
