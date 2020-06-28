@@ -1,6 +1,5 @@
 import strscans
 
-import typedef
 import moon
 
 const STEPS = 1000
@@ -16,7 +15,7 @@ inputFile = open(fileName, fmRead)
 for line in inputFile.lines:
     var m: Moon = Moon()
     var pos: Position
-    discard scanf(line, "<x=$i, y=$i, z=$i>", pos.x, pos.y, pos.z)
+    discard scanf(line, "<x=$i, y=$i, z=$i>", pos[AXIS_X], pos[AXIS_Y], pos[AXIS_Z])
     m.setPosition(pos)
     moons.add(m)
 
