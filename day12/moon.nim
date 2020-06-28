@@ -1,5 +1,14 @@
 import logging
-import typedef
+
+type
+    Axis* = enum
+        AXIS_X, AXIS_Y, AXIS_Z
+
+type
+    Vector* = array[Axis, int]
+    Position* = Vector
+    Velocity* = Vector
+    Acceleration* = Vector
 
 type
     Moon* = ref object of RootObj
@@ -20,46 +29,53 @@ method printMoon*(moon: Moon): void {.base.} =
 method setPosition*(moon: Moon, pos: Position): void {.base.} = 
     moon.position = pos
 
-method getPosition(moon: Moon): Position {.base.} =
+method getPositionOnAnAxis*(moon: Moon, axis: Axis): int {.base.} =
+    return moon.position[axis]
+
+method getPosition*(moon: Moon): Position {.base.} =
     return moon.position
 
+method getVelocityOnAnAxis*(moon: Moon, axis: Axis): int {.base.} =
+    return moon.velocity[axis]
+
+method getVelocity*(moon: Moon): Position {.base.} =
+    return moon.velocity
+
 method calcPotentioalEnergy*(moon: Moon): void {.base.} =
-    moon.potential = uint(abs(moon.position.x) + abs(moon.position.y) + abs(moon.position.z))
+    moon.potential = uint(abs(moon.position[AXIS_X]) + abs(moon.position[AXIS_Y]) + abs(moon.position[AXIS_Z]))
 
 method calcKineticEnergy*(moon: Moon): void {.base.} =
-    moon.kinetic = uint(abs(moon.velocity.vx) + abs(moon.velocity.vy) + abs(moon.velocity.vz))
+    moon.kinetic = uint(abs(moon.velocity[AXIS_X]) + abs(moon.velocity[AXIS_Y]) + abs(moon.velocity[AXIS_Z]))
 
 method calcTotalEnergy*(moon: Moon): uint {.base.} =
     return (moon.potential * moon.kinetic)
 
-method calcAccelerationAgainst*(moon: Moon, counterpart: Moon): void {.base.} =
+method calcAccelerationOnAnAxisAgainst*(moon: Moon, counterpart: Moon, axis: Axis): void {.base.} =
     var counterpartPosition: Position = counterpart.getPosition()
-    # acceleration.ax
-    var cmpResultX = cmp(moon.position.x, counterpartPosition.x)
-    if cmpResultX < 0:
-        inc(moon.acceleration.ax, 1)
-    elif cmpResultX > 0:
-        inc(moon.acceleration.ax, -1)
-    # acceleration.ay
-    var cmpResultY = cmp(moon.position.y, counterpartPosition.y)
-    if cmpResultY < 0:
-        inc(moon.acceleration.ay, 1)
-    elif cmpResultY > 0:
-        inc(moon.acceleration.ay, -1)
-    # acceleration.az
-    var cmpResultZ = cmp(moon.position.z, counterpartPosition.z)
-    if cmpResultZ < 0:
-        inc(moon.acceleration.az, 1)
-    elif cmpResultZ > 0:
-        inc(moon.acceleration.az, -1)
+    var cmpresult = cmp(moon.position[axis], counterpartPosition[axis])
+    if cmpresult < 0:
+        inc(moon.acceleration[axis], 1)
+    elif cmpresult > 0:
+        inc(moon.acceleration[axis], -1)
+
+method calcAccelerationAgainst*(moon: Moon, counterpart: Moon): void {.base.} =
+    moon.calcAccelerationOnAnAxisAgainst(counterpart, AXIS_X)
+    moon.calcAccelerationOnAnAxisAgainst(counterpart, AXIS_Y)
+    moon.calcAccelerationOnAnAxisAgainst(counterpart, AXIS_Z)
+
+method updateVelocityOnAnAxis*(moon: Moon, axis: Axis): void {.base.} =
+    inc(moon.velocity[axis], moon.acceleration[axis])
+    moon.acceleration[axis] = 0
 
 method updateVelocity*(moon: Moon): void {.base.} =
-    inc(moon.velocity.vx, moon.acceleration.ax)
-    inc(moon.velocity.vy, moon.acceleration.ay)
-    inc(moon.velocity.vz, moon.acceleration.az)
-    moon.acceleration = (0, 0, 0)
+    moon.updateVelocityOnAnAxis(AXIS_X)
+    moon.updateVelocityOnAnAxis(AXIS_Y)
+    moon.updateVelocityOnAnAxis(AXIS_Z)
+
+method updatePositionOnAnAxis*(moon: Moon, axis: Axis): void {.base.} =
+    inc(moon.position[axis], moon.velocity[axis])
 
 method updatePosition*(moon: Moon): void {.base.} =
-    inc(moon.position.x, moon.velocity.vx)
-    inc(moon.position.y, moon.velocity.vy)
-    inc(moon.position.z, moon.velocity.vz)
+    moon.updatePositionOnAnAxis(AXIS_X)
+    moon.updatePositionOnAnAxis(AXIS_Y)
+    moon.updatePositionOnAnAxis(AXIS_Z)
